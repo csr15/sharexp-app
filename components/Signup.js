@@ -26,12 +26,13 @@ const Signup = ({ switchToSignupHandler }) => {
   const ErrorAlert = () => {
     Alert.alert(
       "Something Went Wrong",
-      "Something went wrong on updaying details please try again",
+      "Something went wrong on updating details please try again",
       [{ text: "Ok" }],
       { cancelable: true }
     );
   };
 
+  //Verifyin whether the entered mail ID is valid or not
   const mailValidationHandler = () => {
     if (signupData.mail) {
       const emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
@@ -43,8 +44,9 @@ const Signup = ({ switchToSignupHandler }) => {
     }
   };
 
+  //Checking whether the entered mail ID is available or not
   const mailAvailabilityHandler = async () => {
-    if (signupData.mail) {
+    if (!isMailValidityError) {
       try {
         const { data } = await axios.post(
           `${Proxy.proxy}/auth/mailValidation/${signupData.mail}`
@@ -52,14 +54,16 @@ const Signup = ({ switchToSignupHandler }) => {
 
         console.log(data);
         if (data.length === 0) {
-          setIsMailAvailable(data);
-        } else setIsMailAvailable("");
+          setIsMailAvailable(false);
+        } else setIsMailAvailable(true);
       } catch (error) {
+        console.log(error);
         ErrorAlert();
       }
     }
   };
 
+  //Validting the entered password
   const passwordValidationHandler = () => {
     if (signupData.password.length < 8) {
       setIsPasswordError(true);
@@ -68,6 +72,7 @@ const Signup = ({ switchToSignupHandler }) => {
     }
   };
 
+  //Validting the entered username is available or not
   const userNameHandler = async () => {
     if (signupData.userName !== "") {
       try {
@@ -75,7 +80,6 @@ const Signup = ({ switchToSignupHandler }) => {
           `${Proxy.proxy}/auth/checkUserName/${signupData.userName}`
         );
 
-        console.log(data);
         if (data.length > 0) {
           setIsUserNameError(true);
         } else {
@@ -87,6 +91,7 @@ const Signup = ({ switchToSignupHandler }) => {
     }
   };
 
+  //Validting the entered surename is valid nor not
   const sureNameHandler = (e) => {
     if (signupData.sureName !== "")
       if (/^[a-zA-Z ]+$/.test(signupData.sureName)) {
@@ -96,6 +101,7 @@ const Signup = ({ switchToSignupHandler }) => {
       }
   };
 
+  //Creating an account handler
   const dispatch = useDispatch();
   const formHandler = () => {
     if (
@@ -111,8 +117,14 @@ const Signup = ({ switchToSignupHandler }) => {
         { cancelable: true }
       );
     } else {
+      console.log(
+        isMailAvailable,
+        !isUserNameError,
+        !isSurenameError,
+        !isPasswordError
+      );
       if (
-        isMailAvailable &&
+        (isMailAvailable !== "" || isMailAvailable === true) &&
         !isUserNameError &&
         !isSurenameError &&
         !isPasswordError
@@ -129,7 +141,6 @@ const Signup = ({ switchToSignupHandler }) => {
           })
         )
           .then((res) => {
-            console.log(res);
             setIsLoading(false);
           })
           .catch((err) => {
@@ -155,6 +166,7 @@ const Signup = ({ switchToSignupHandler }) => {
         label="Enter an User Name"
         id="SIGNUP-userName"
         validationHandler={userNameHandler}
+        value={signupData.userName}
         errorMessage={
           isUserNameError ? "This user name is already in use " : null
         }
@@ -167,6 +179,7 @@ const Signup = ({ switchToSignupHandler }) => {
         label="Enter Sure Name"
         id="SIGNUP-sureName"
         validationHandler={sureNameHandler}
+        value={signupData.sureName}
         errorMessage={isSurenameError ? "Please enter a valid sure name" : null}
         inputHandler={(text) =>
           setSignupData({ ...signupData, sureName: text })
@@ -177,19 +190,26 @@ const Signup = ({ switchToSignupHandler }) => {
         label="Enter a Mail ID"
         id="SIGNUP-mail"
         validationHandler={mailValidationHandler}
+        keyboard="email-address"
+        value={signupData.mail}
         errorMessage={
           isMailValidityError ? "Please enter a valid Mail ID" : null
         }
-        mailError={isMailAvailable ? "This mail ID is already in use" : null}
+        mailError={
+          isMailAvailable && isMailAvailable
+            ? "This mail ID is already in use"
+            : null
+        }
         inputHandler={(text) => setSignupData({ ...signupData, mail: text })}
       />
       <Input
         placeHolder="*****"
         label="Enter Password"
-        id="LOGIN-password"
+        id="SIGNIN-password"
         inputHandler={(text) =>
           setSignupData({ ...signupData, password: text })
         }
+        value={signupData.password}
         onFocusHandler={mailAvailabilityHandler}
         isPassword
         validationHandler={passwordValidationHandler}
@@ -202,7 +222,7 @@ const Signup = ({ switchToSignupHandler }) => {
         <Text style={styles.signup}>
           Already have an account?{" "}
           <Text style={styles.signupText} onPress={switchToSignupHandler}>
-            LOGIN
+            SIGNIN
           </Text>
         </Text>
       </View>

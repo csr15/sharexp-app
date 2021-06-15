@@ -9,15 +9,21 @@ import {
   Text,
   View,
 } from "react-native";
-import { ScrollView, TouchableOpacity } from "react-native-gesture-handler";
+import {
+  TouchableNativeFeedback,
+  TouchableOpacity,
+} from "react-native-gesture-handler";
+import { useDispatch, useSelector } from "react-redux";
 
 import StoryGrid from "../components/StoryGrid";
 import Colors from "../constants/Colors";
 import Proxy from "../constants/Proxy";
+import * as actions from "../store/actions/profile-actions";
 
 const TagStoriesScreen = (props) => {
   const [tagStories, setTagStories] = useState("");
   const [refreshLoader, setRefreshLoader] = useState(true);
+  const [loader, setLoader] = useState(false);
 
   useEffect(() => {
     fetchTagStoriesHandler();
@@ -26,13 +32,16 @@ const TagStoriesScreen = (props) => {
   const tagName = props.navigation.getParam("tagName");
   const tagImg = props.navigation.getParam("tagImg");
   const fetchTagStoriesHandler = async () => {
+    setRefreshLoader(true);
     try {
       const { data } = await axios.get(
         `${Proxy.proxy}/search/tagStories/${tagName.substr(1)}`
       );
 
       setTagStories(data);
+      setRefreshLoader(false);
     } catch (error) {
+      setRefreshLoader(false);
       Alert.alert(
         "Something went wrong!",
         `Could not fetch stories for ${tagName} tag please try again`,
@@ -51,12 +60,35 @@ const TagStoriesScreen = (props) => {
     );
   };
 
+  //mapStateToProps
+  const state = useSelector((state) => {
+    return state.profile.userDetails;
+  });
+  const userDetails = useSelector((state) => {
+    return state.profile.userDetails;
+  });
+
+  //mapDispatchToProps
+  const dispatch = useDispatch();
+  const fetchUserDetailsHandler = () => {
+    setLoader(true);
+    dispatch(actions.fetchUserDetails(state._id))
+      .then(() => {
+        setLoader(false);
+      })
+      .catch((err) => console.log(err));
+  };
+
   const followTagHandler = async () => {
     try {
       const { data } = await axios.post(
-        `${Proxy.proxy}/profile/followTag/5fba542cce69110017e2d13a`
+        `${Proxy.proxy}/profile/followTag/${state._id}`,
+        {
+          tagName: tagName,
+        }
       );
-      console.log(data);
+
+      fetchUserDetailsHandler();
     } catch (error) {
       console.log(error);
       errorAlert();
@@ -66,14 +98,20 @@ const TagStoriesScreen = (props) => {
   const unFollowTagHandler = async () => {
     try {
       const { data } = await axios.post(
-        `${Proxy.proxy}/profile/unFollowTag/5fba542cce69110017e2d13a`
+        `${Proxy.proxy}/profile/unFollowTag/${state._id}`,
+        {
+          tagName: tagName,
+        }
       );
-      console.log(data);
+
+      fetchUserDetailsHandler();
     } catch (error) {
-      console.log(error);
       errorAlert();
+      console.log(error);
     }
   };
+
+  console.log(userDetails.userDetails.following);
 
   return (
     <View style={{ flex: 1, paddingHorizontal: 10 }}>
@@ -98,12 +136,28 @@ const TagStoriesScreen = (props) => {
                     {tagStories ? tagStories.length : 0} Stories
                   </Text>
                   <View style={styles.spacer}></View>
-                  <TouchableOpacity
-                    style={styles.followButton}
-                    onPress={followTagHandler}
-                  >
-                    <Text style={styles.buttonText}>Follow</Text>
-                  </TouchableOpacity>
+                  {loader ? (
+                    <TouchableNativeFeedback
+                      disabled={true}
+                      style={styles.followButton}
+                    >
+                      <Text style={styles.buttonText}>Updating..</Text>
+                    </TouchableNativeFeedback>
+                  ) : userDetails.userDetails.following.includes(tagName) ? (
+                    <TouchableOpacity
+                      style={styles.followButton}
+                      onPress={unFollowTagHandler}
+                    >
+                      <Text style={styles.buttonText}>Unfollow</Text>
+                    </TouchableOpacity>
+                  ) : (
+                    <TouchableOpacity
+                      style={styles.followButton}
+                      onPress={followTagHandler}
+                    >
+                      <Text style={styles.buttonText}>Follow</Text>
+                    </TouchableOpacity>
+                  )}
                 </View>
               </LinearGradient>
             </ImageBackground>
@@ -112,6 +166,7 @@ const TagStoriesScreen = (props) => {
             fetchHandler={fetchTagStoriesHandler}
             refreshHandler={refreshLoader}
             data={tagStories}
+            searchStory
             navigation={props.navigation}
           />
         </>

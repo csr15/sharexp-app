@@ -20,11 +20,13 @@ import Navigator from "./Navigaton/Navigator";
 import storiesReducer from "./store/reducers/stories-reucer";
 import profileReducer from "./store/reducers/profile-reducer";
 import newStoryReducer from "./store/reducers/newStory-reduer";
+import authReducer from "./store/reducers/auth-reducer";
 
 const rootReducer = combineReducers({
   stories: storiesReducer,
   profile: profileReducer,
   newStory: newStoryReducer,
+  auth: authReducer
 });
 
 const store = createStore(rootReducer, applyMiddleware(ReduxThunk));
@@ -47,7 +49,6 @@ export default function App() {
       <Provider store={store}>
         <Navigator />
       </Provider>
-      // <Demo />
     );
   }
 }

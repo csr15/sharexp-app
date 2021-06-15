@@ -1,6 +1,5 @@
 import React from "react";
-import { StyleSheet, Text, View } from "react-native";
-import { FlatList } from "react-native-gesture-handler";
+import { FlatList } from "react-native";
 
 import Story from "./Story";
 
@@ -13,13 +12,14 @@ const StoryGrid = (props) => {
       showsVerticalScrollIndicator={false}
       keyExtractor={(item, index) => "key" + index}
       renderItem={({ item }) => {
+        console.log(item._id)
         return (
           <Story
             viewStoryHandler={() =>
               props.navigation.navigate("ViewStory", {
                 storyId: item._id,
                 title: item.story.title,
-                authorId: item.uid
+                authorId: item.uid,
               })
             }
             userName={item.userName}
@@ -34,5 +34,3 @@ const StoryGrid = (props) => {
 };
 
 export default StoryGrid;
-
-const styles = StyleSheet.create({});

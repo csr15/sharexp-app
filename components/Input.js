@@ -13,8 +13,9 @@ const Input = ({
   errorMessage,
   isPassword,
   mailError,
+  keyboard,
+  value
 }) => {
-  console.log(mailError)
   return (
     <View style={styles.container}>
       <Text style={styles.label}>{label}</Text>
@@ -24,9 +25,11 @@ const Input = ({
         onFocus={onFocusHandler}
         onChangeText={inputHandler}
         onBlur={validationHandler}
+        keyboardType={keyboard}
         secureTextEntry={isPassword}
         autoCompleteType="off"
         autoCapitalize="none"
+        value={value}
       />
       {errorMessage && <Text style={styles.error}>{errorMessage}</Text>}
       {mailError && <Text style={styles.error}>{mailError}</Text>}

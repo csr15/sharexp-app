@@ -46,7 +46,6 @@ const ViewStoryScreen = (props) => {
   useEffect(() => {
     navigation.addListener("didFocus", () => {
       fetchStoryHandler();
-      console.log(storyId);
       fetchAuthorDetailsHandler();
     });
     return () => {
@@ -57,7 +56,9 @@ const ViewStoryScreen = (props) => {
   //Fetch story
   const fetchStoryHandler = useCallback(async () => {
     try {
+      console.log(`I called ${storyId}`)
       const { data } = await axios.get(`${Proxy.proxy}/storyData/${storyId}`);
+      console.log(data);
       setStory(data);
     } catch (error) {
       throw new Error("Something went wrong on getting story");
@@ -99,7 +100,7 @@ const ViewStoryScreen = (props) => {
         storyId: story._id,
         uid: state._id,
         authorId: author._id,
-        userName: "ragulcs",
+        userName: state.userDetails.userName,
         storyTitle: story.story.title,
       });
 
@@ -150,7 +151,7 @@ const ViewStoryScreen = (props) => {
   const shareHandler = async () => {
     try {
       const result = await Share.share({
-        message: `Hey buddy, ${state.userName} wants you to read this awesome story "${story.story.title}" on shareXP. https://sharexp.netlify.app/viewstory/${story._id}/${author._id}`,
+        message: `Hey buddy, ${state.userDetails.userName} wants you to read this awesome story "${story.story.title}" on shareXP. https://sharexp.netlify.app/viewstory/${story._id}/${author._id}`,
       });
     } catch (error) {
       AlertMessage(error.message);
@@ -206,11 +207,11 @@ const ViewStoryScreen = (props) => {
               );
             })}
           </ScrollView>
-          {story.story.img && (
+          {story.story.img ? (
             <View style={styles.storyImage}>
               <Image style={styles.image} source={{ uri: story.story.img }} />
             </View>
-          )}
+          ) : null}
           <View style={styles.title}>
             <Text style={styles.titleText}>{story.story.title}</Text>
           </View>
@@ -312,7 +313,7 @@ const styles = StyleSheet.create({
     fontFamily: "Poppins_600SemiBold",
     fontSize: 16,
     marginBottom: 0,
-    lineHeight: 16,
+    lineHeight: 20,
   },
   details: {
     flexDirection: "row",
@@ -413,7 +414,7 @@ ViewStoryScreen.navigationOptions = (navData) => {
     headerTitle: () => (
       <Text
         numberOfLines={1}
-        style={{ fontFamily: "Poppins_500Medium", fontSize: 18 }}
+        style={{ fontFamily: "Poppins_600SemiBold", fontSize: 18 }}
       >
         {title}
       </Text>

@@ -61,7 +61,7 @@ const CommentScreen = (props) => {
     setLoader(true);
     const avatar = props.navigation.getParam("avatar");
     const authorId = props.navigation.getParam("authorId");
-    const userName = userDetails.userName;
+    const userName = userDetails.userDetails.userName;
     const uid = userDetails._id;
 
     const data = {

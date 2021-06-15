@@ -274,5 +274,4 @@ const styles = StyleSheet.create({
 
 SearchScreen.navigationOptions = {
   cardStyle: { backgroundColor: "white" },
-  headerShown: false,
 };

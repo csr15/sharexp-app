@@ -98,4 +98,7 @@ export const StoryStyles = {
     fontSize: 16,
     fontFamily: "Merriweather_400Regular",
   },
+  b: {
+    fontFamily: "Merriweather_700Bold"
+  }
 };

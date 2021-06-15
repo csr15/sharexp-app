@@ -1,8 +1,13 @@
-import { TOP_STORIES, LATEST_STORIES } from "../actions/stories-actions";
+import {
+  TOP_STORIES,
+  LATEST_STORIES,
+  FOLLOWING_STORIES,
+} from "../actions/stories-actions";
 
 const initialState = {
   topStories: "",
   latestStories: "",
+  followingStories: "",
   comments: "",
 };
 
@@ -17,6 +22,11 @@ const storiesReducer = (state = initialState, action) => {
       return {
         ...state,
         latestStories: action.payload,
+      };
+    case FOLLOWING_STORIES:
+      return {
+        ...state,
+        followingStories: action.payload,
       };
     case "COMMENTS":
       return {

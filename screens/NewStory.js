@@ -2,7 +2,7 @@ import axios from "axios";
 import React, { useState } from "react";
 import { useEffect } from "react";
 import { View, Text, Alert } from "react-native";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import Loader from "../components/Loader";
 
 import NewStoryTitle from "../components/NewStoryTitle";
@@ -29,6 +29,11 @@ const NewStory = (props) => {
     };
   }, [isStoryPublishing]);
 
+  //mapStateToProps
+  const state = useSelector(state => {
+    return state.profile.userDetails
+  })
+
   //Redux dispatcher
   const dispatch = useDispatch();
 
@@ -41,10 +46,10 @@ const NewStory = (props) => {
 
     try {
       const { data } = await axios.post(
-        `${Proxy.proxy}/publish/5fba542cce69110017e2d13a`,
+        `${Proxy.proxy}/publish/${state._id}`,
         {
-          uid: "5fba542cce69110017e2d13a",
-          userName: "ragulcs",
+          uid: state._id,
+          userName: state.userDetails.userName,
           story: {
             ...story,
             content: article,

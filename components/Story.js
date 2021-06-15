@@ -6,7 +6,8 @@ import { Ionicons } from "@expo/vector-icons";
 import Colors from "../constants/Colors";
 
 const Story = ({ viewStoryHandler, userName, createdAt, story, views }) => {
-  const cleanText = story.content.replace(/<\/?[^>]+(>|$)/g, "");
+  let cleanText = story.content.replace(/<\/?[^>]+(>|$)/g, "");
+  cleanText = cleanText.replace("&nbsp;", " ");
   return (
     <TouchableOpacity
       style={styles.story}
@@ -68,12 +69,12 @@ const styles = StyleSheet.create({
   },
   imageContainer: {
     width: "30%",
-    height: 130
+    height: 130,
   },
   image: {
     width: "100%",
     height: "100%",
-    backgroundColor: Colors.primary
+    backgroundColor: Colors.primary,
   },
   author: {
     color: Colors.accent,

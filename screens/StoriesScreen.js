@@ -4,19 +4,17 @@ import {
   Text,
   StyleSheet,
   Image,
-  FlatList,
   ActivityIndicator,
 } from "react-native";
 import { ScrollView, TouchableOpacity } from "react-native-gesture-handler";
 import { useDispatch, useSelector } from "react-redux";
 
 import Colors from "../constants/Colors";
-import Story from "../components/Story";
 import * as actions from "../store/actions/stories-actions";
 import StoryGrid from "../components/StoryGrid";
 
 const StoriesScreen = (props) => {
-  const [refreshLoader, setRefreshLoader] = useState(true);
+  const [refreshLoader, setRefreshLoader] = useState(false);
   const [storyType, setStoryType] = useState("top");
 
   //MapStateToProps;
@@ -31,20 +29,36 @@ const StoriesScreen = (props) => {
     return {
       topStories: state.stories.topStories,
       latestStories: state.stories.latestStories,
+      followingStories: state.stories.followingStories,
+      userDetails: state.profile.userDetails,
     };
   });
 
   useEffect(() => {
     if (storyType === "top") fetchTopStoriesHandler();
     else if (storyType === "latest") fetchLatestStoriesHandler();
+    else if (storyType === "following") fetchFollowingStoriesHandler();
   }, [storyType]);
 
   const fetchTopStoriesHandler = () => {
-    dispatch(mapDispatchtoProps.topStories);
+    setRefreshLoader(true);
+    dispatch(mapDispatchtoProps.topStories)
+      .then(() => setRefreshLoader(false))
+      .catch((err) => console.log(err));
   };
 
   const fetchLatestStoriesHandler = () => {
-    dispatch(mapDispatchtoProps.latestStories);
+    setRefreshLoader(true);
+    dispatch(mapDispatchtoProps.latestStories)
+      .then(() => setRefreshLoader(false))
+      .catch((err) => console.log(err));
+  };
+
+  const fetchFollowingStoriesHandler = () => {
+    setRefreshLoader(true);
+    dispatch(actions.fetchFollowingStories(state.userDetails._id))
+      .then(() => setRefreshLoader(false))
+      .catch((err) => console.log(err));
   };
 
   return (
@@ -119,6 +133,21 @@ const StoriesScreen = (props) => {
             fetchHandler={fetchLatestStoriesHandler}
             refreshHandler={refreshLoader}
             data={state.latestStories}
+            navigation={props.navigation}
+          />
+        ) : (
+          <View style={styles.loader}>
+            <ActivityIndicator size="large" color={Colors.seconary} />
+          </View>
+        )
+      ) : null}
+
+      {storyType === "following" ? (
+        state.followingStories ? (
+          <StoryGrid
+            fetchHandler={fetchFollowingStoriesHandler}
+            refreshHandler={refreshLoader}
+            data={state.followingStories}
             navigation={props.navigation}
           />
         ) : (

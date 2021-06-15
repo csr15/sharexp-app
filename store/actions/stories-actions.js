@@ -3,6 +3,7 @@ import Proxy from "../../constants/Proxy";
 
 export const TOP_STORIES = "TOP_STORIES";
 export const LATEST_STORIES = "LATEST_STORIES";
+export const FOLLOWING_STORIES = "FOLLOWING_STORIES";
 
 export const fetchTopStories = () => {
   return async (dispatch) => {
@@ -27,6 +28,20 @@ export const fetchLatestStories = () => {
 
       dispatch({ type: LATEST_STORIES, payload: data });
     } catch (error) {
+      throw new Error("Something went wrong on fetching stories");
+    }
+  };
+};
+
+export const fetchFollowingStories = (uid) => {
+  return async (dispatch) => {
+    try {
+      const { data } = await axios.get(
+        `${Proxy.proxy}/userStories/stories/followingTagStories/${uid}`
+      );
+      dispatch({ type: FOLLOWING_STORIES, payload: data });
+    } catch (error) {
+      console.log(error)
       throw new Error("Something went wrong on fetching stories");
     }
   };

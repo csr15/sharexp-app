@@ -1,17 +1,27 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Alert, StyleSheet, Text, View } from "react-native";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import Colors from "../constants/Colors";
 
 import * as actions from "../store/actions/auth-actions";
 import Button from "./Button";
 import Input from "./Input";
 
-const Login = ({switchToSignupHandler}) => {
+const Signin = ({ navigation, switchToSignupHandler }) => {
   const [mail, setMail] = useState("");
   const [isMailNotValid, setIsMailNotValid] = useState(false);
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
+  const state = useSelector((state) => {
+    return {
+      signupData: state.auth.signupData,
+    };
+  });
+
+  useEffect(() => {
+    setMail(state.signupData.mail);
+  }, [state.signupData]);
 
   const mailValidationHandler = () => {
     const emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
@@ -27,30 +37,31 @@ const Login = ({switchToSignupHandler}) => {
     if (mail === "" && password === "") {
       Alert.alert(
         "Please fill all fields",
-        "Fill all fields to login",
+        "Fill all fields to signin",
         [{ text: "okay" }],
         { cancelable: true }
       );
-      return;
-    }
-
-    setIsLoading(true);
-    dispatch(
-      actions.loginHandler({
-        mail: mail.toLowerCase(),
-        password: password,
-      })
-    )
-      .then((res) => {
-        setIsLoading(false);
-      })
-      .catch((err) => {
-        console.log(err);
-        setIsLoading(false);
-        Alert.alert("Problem on Login", err.message, [{ text: "okay" }], {
-          cancelable: true,
+    } else {
+      setIsLoading(true);
+      dispatch(
+        actions.signinHandler({
+          data: {
+            mail: mail.toLowerCase(),
+            password: password,
+          },
+        })
+      )
+        .then((res) => {
+          setIsLoading(false);
+          navigation.navigate("Startup");
+        })
+        .catch((err) => {
+          setIsLoading(false);
+          Alert.alert("Problem on Signin", err.message, [{ text: "okay" }], {
+            cancelable: true,
+          });
         });
-      });
+    }
   };
 
   return (
@@ -61,7 +72,9 @@ const Login = ({switchToSignupHandler}) => {
       <Input
         placeHolder="user@mail.com"
         label="Your Mail ID"
-        id="LOGIN-mail"
+        id="SIGIN-mail"
+        keyboard="email-address"
+        value={mail}
         validationHandler={mailValidationHandler}
         errorMessage={isMailNotValid ? "Please enter a valid email ID " : null}
         inputHandler={(text) => setMail(text)}
@@ -69,21 +82,25 @@ const Login = ({switchToSignupHandler}) => {
       <Input
         placeHolder="*****"
         label="Enter Password"
-        id="LOGIN-password"
+        id="SIGIN-password"
+        value={password}
         inputHandler={(text) => setPassword(text)}
         isPassword
       />
-      <Button text="login" onClickHandler={formHandler} loader={isLoading} />
+      <Button text="signin" onClickHandler={formHandler} loader={isLoading} />
       <View style={styles.signupContainer}>
         <Text style={styles.signup}>
-          Don't have an account? <Text style={styles.signupText} onPress={switchToSignupHandler}>SINGNUP</Text>{" "}
+          Don't have an account?{" "}
+          <Text style={styles.signupText} onPress={switchToSignupHandler}>
+            SINGNUP
+          </Text>{" "}
         </Text>
       </View>
     </View>
   );
 };
 
-export default Login;
+export default Signin;
 
 const styles = StyleSheet.create({
   container: {
