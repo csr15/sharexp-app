@@ -14,8 +14,8 @@
 
 - React Native
 
-- Bootstrap
-- React
+
+
 - React Redux
 - Redux Thunk
 - Express JS
@@ -27,5 +27,5 @@
 - Rate Limiter
 - Google Analytics
 - Heroku (backend)
-- Netlify (frontend)
+
  
