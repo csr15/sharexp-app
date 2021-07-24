@@ -11,9 +11,9 @@
 - Comment your thoughts about the story
 
 ## Technologies used
-- HTML
-- CSS
-- JS
+
+- React Native
+
 - Bootstrap
 - React
 - React Redux
@@ -28,3 +28,4 @@
 - Google Analytics
 - Heroku (backend)
 - Netlify (frontend)
+ 
